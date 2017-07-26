@@ -7,4 +7,3 @@ puts XO("xoox0xx")
 
 
 
-xxxxx
