@@ -1,0 +1,108 @@
+              %table.table.table-hover.table-responsive.footable
+                %thead
+                  %tr
+                    %th 标的id
+                    %th 借款用户
+                    %th 标的金额
+                    %th 标的状态
+                    %th 开标时间
+                    %th 首投用户
+                    %th 首投时间
+                    %th 首投金额
+                    %th 首投来源
+                    %th 尾投用户
+                    %th 满标时间
+                    %th 满标金额
+                    %th 满标用时(小时)
+                    %th 尾投来源
+                - if @projects.present?
+                  - @projects.each do |project|
+                    - if project.fulled_at.present?
+                      - bids = project.bids.where(["created_at <=?", project.fulled_at]).order("id")
+                    - else
+                      - bids = project.bids.order("id")
+                    %tbody
+                      %tr.product-records-row{:id => "#{project.id}"}
+                        %td
+                          %span.prre-table-toggle
+                          = project.id
+                        %td
+                          %span [
+                          = project.borrower.name
+                          = project.borrower.id
+                          %span ]
+                        %td= rmb(project.amount)
+                        %td= I18n.t(project.status)
+                        %td= project.created_at.to_s(:full)
+                        - if bids.present?
+                          %td
+                            %span [
+                            = bids.first.lender.name
+                            = bids.first.lender.id
+                            %span ]
+                          %td= bids.first.created_at.to_s(:full)
+                          %td.firstinvest-money.clearfix
+                            - left_money = bids.first.invest_money - bids.first.sub_bids.map(&:invest_money_all).sum
+                            %p.pull-left= rmb(bids.first.invest_money)
+                            - if bids.first.coupon_status.present?
+                              .product-records-coupon.pull-left
+                                %p.coupon-icon.text-center 券
+                                .prre-coupon-main.text-center
+                                  %div
+                                    %p.prre-coupon-arrow
+                                    %p
+                                      已使用现金券：
+                                      %b= rmb(bids.first.user_coupon.amount)
+                                    %p
+                                      实际支付金额：
+                                      %b= rmb(bids.first.invest_amount)
+                          %td= bids.first.lender.source
+                          - if bids.count<=1
+                            %td
+                              %span [
+                              = bids.last.lender.name
+                              = bids.last.lender.id
+                              %span ]
+                            %td= bids.last.created_at.to_s(:full)
+                            %td.firstinvest-money.clearfix
+                              - left_money = bids.last.invest_money - bids.last.sub_bids.map(&:invest_money_all).sum
+                              %p.pull-left= rmb(bids.last.invest_money)
+                              - if bids.last.coupon_status.present?
+                                .product-records-coupon.pull-left
+                                  %p.coupon-icon.text-center 券
+                                  .prre-coupon-main.text-center
+                                    %div
+                                      %p.prre-coupon-arrow
+                                      %p
+                                        已使用现金券：
+                                        %b= rmb(bids.last.user_coupon.amount)
+                                      %p
+                                        实际支付金额：
+                                        %b= rmb(bids.last.invest_amount)
+                            %td= project.bidded_time_hours
+                          - else
+                            %td
+                              %span [
+                              = bids.last.lender.name
+                              = bids.last.lender.id
+                              %span ]
+                            %td= bids.last.created_at.to_s(:full)
+                            %td.firstinvest-money.clearfix
+                              - left_money = bids.last.invest_money - bids.last.sub_bids.map(&:invest_money_all).sum
+                              %p.pull-left= rmb(bids.last.invest_money)
+                              - if bids.last.coupon_status.present?
+                                .product-records-coupon.pull-left
+                                  %p.coupon-icon.text-center 券
+                                  .prre-coupon-main.text-center
+                                    %div
+                                      %p.prre-coupon-arrow
+                                      %p
+                                        已使用现金券：
+                                        %b= rmb(bids.last.user_coupon.amount)
+                                      %p
+                                        实际支付金额：
+                                        %b= rmb(bids.last.invest_amount)
+                            %td= project.bidded_time_hours
+                            %td= bids.last.lender.source
+                      %tr.product-records-details
+                        / 填充内容
